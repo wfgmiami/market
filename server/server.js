@@ -7,7 +7,7 @@ const router = require('./routes/routes.js');
 const server = require('http').createServer(app);
 
 const io = socketio(server);
-
+const test = 0;
 io.on( 'connection', (socket) => {
 	console.log('Client has connected!');
 	console.log(socket.id);
