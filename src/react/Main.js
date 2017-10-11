@@ -4,30 +4,30 @@ import { render } from 'react-dom';
 
 
 
-const Main = () => (
+const Main = ( { data }) => {
 	
-	<div className="row">
-		<Link to="/topStocks">
-			<div className="col-sm-6">
-				<ul className="list-group">
-					<li className="list-group-item">
-						Top 10
-					</li>
-				</ul>
+return(
+	<div className="row">	
+			<div className="col-sm-4">
+				
+					
+					{ data.data.length > 0 && data.data.map( (stock, idx) => 
+						
+						(
+						<div key = { idx } className="panel panel-default">	
+						<div className="panel-heading">{ stock.quotes.price.symbol }</div>
+						<div className="panel-body">{ stock.quotes.price.regularMarketPrice }</div>
+						</div>
+						)
+					  )  
+				    }	
+								
+			
 			</div>
-		</Link>
+	</div>		
+			
 
-		<Link to="/bottomStocks">
-			<div className="col-sm-6">
-				<ul className="list-group">
-					<li className="list-group-item">
-						Bottom 10
-					</li>
-				</ul>	
-			</div>
-		</Link>
-	</div>				
-)
-
+	)	
+}
 
 export default Main;

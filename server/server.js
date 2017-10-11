@@ -7,7 +7,7 @@ const router = require('./routes/routes.js');
 const server = require('http').createServer(app);
 
 const io = socketio(server);
-const test = 0;
+
 io.on( 'connection', (socket) => {
 	console.log('Client has connected!');
 	console.log(socket.id);
@@ -24,22 +24,15 @@ app.use( '/stylesheets', express.static( path.join( __dirname, '..', 'browser/st
 
 
 
-app.get( '/', ( req, res, next ) => {
-//	res.redirect('/topStocks');	
-	res.sendFile( path.join( __dirname,'..', 'browser/index.html' ) );	
-
-})
-
-app.get( '/topStocks', ( req, res, next ) => {
+app.get( '/', ( req, res, next ) => {	
 	res.sendFile( path.join( __dirname,'..', 'browser/index.html' ) );	
 })
 
-app.get( '/bottomStocks', ( req, res, next ) => {
-	res.sendFile( path.join( __dirname,'..', 'browser/index.html' ) );	
-})
 
 app.use( '/api', router );
-
+app.use((err, req, res, next) => {
+	console.log(err);
+})
 const port = process.env.PORT || 3000;
 
 server.listen(port, () => {

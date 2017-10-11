@@ -10,6 +10,8 @@ const Best = ( { best } ) => {
 			<div className="container">
 			<Header/>
 				<Main />
+				<div className="row">
+				<div className="col-sm-6">
 				<ul className="list-group">
 					<li className="list-group-item">
 					
@@ -22,7 +24,8 @@ const Best = ( { best } ) => {
 						
 					</li>
 				</ul>
-				
+				</div>
+				</div>
 			</div>
 		)
 }
