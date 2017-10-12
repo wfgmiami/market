@@ -29743,6 +29743,10 @@ var _Main = __webpack_require__(296);
 
 var _Main2 = _interopRequireDefault(_Main);
 
+var _MsgBox = __webpack_require__(297);
+
+var _MsgBox2 = _interopRequireDefault(_MsgBox);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -29750,6 +29754,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+// function subscriber(){
+var socket = io(window.location.origin);
+socket.on('connect', function () {
+	console.log(window.location.origin);
+});
+// 	socket.on('newPrices', console.log)
+// }
+
 
 var App = function (_Component) {
 	_inherits(App, _Component);
@@ -29761,28 +29774,45 @@ var App = function (_Component) {
 
 		_this.state = {
 			data: []
-		};
-		return _this;
+
+			// subscriber( (err, msg) => this.setState({ msg }))
+		};return _this;
 	}
 
 	_createClass(App, [{
 		key: 'componentDidMount',
 		value: function componentDidMount() {
+			// axios.get('/api/portfolio')
+			// 	.then( response =>  response.data  )
+			// 	.then( data => {
+			// 		//const price = data.quotes.price;
+			// 		//const summaryDetail = data.quotes.summaryDetail;
+			// 		this.setState( { data } );
+			// 		console.log('...........', this.state)
+			// 	} )'
+
+		}
+	}, {
+		key: 'componentWillMount',
+		value: function componentWillMount() {
 			var _this2 = this;
 
-			_axios2.default.get('/api/portfolio').then(function (response) {
-				return response.data;
-			}).then(function (data) {
-				//const price = data.quotes.price;
-				//const summaryDetail = data.quotes.summaryDetail;
-				_this2.setState({ data: data });
-				console.log('...........', _this2.state);
+			var self = this;
+
+			socket.on('sendData', function () {
+				_axios2.default.get('/api/portfolio').then(function (response) {
+					return response.data;
+				}).then(function (data) {
+					//const price = data.quotes.price;
+					//const summaryDetail = data.quotes.summaryDetail;
+					_this2.setState({ data: data });
+				});
 			});
 		}
 	}, {
 		key: 'render',
 		value: function render() {
-
+			//console.log(this.state)
 			return _react2.default.createElement(
 				'div',
 				{ className: 'container' },
@@ -30743,12 +30773,23 @@ var Main = function Main(_ref) {
 					_react2.default.createElement(
 						'div',
 						{ className: 'panel-heading' },
+						stock.quotes.price.shortName,
+						', ',
+						'',
+						'  ',
 						stock.quotes.price.symbol
 					),
 					_react2.default.createElement(
 						'div',
 						{ className: 'panel-body' },
-						stock.quotes.price.regularMarketPrice
+						'Price: ',
+						stock.quotes.price.regularMarketPrice,
+						_react2.default.createElement(
+							'div',
+							null,
+							'% change:',
+							parseFloat((stock.quotes.price.regularMarketChangePercent * 100).toFixed(2)) + "%"
+						)
 					)
 				);
 			})
@@ -30757,6 +30798,38 @@ var Main = function Main(_ref) {
 };
 
 exports.default = Main;
+
+/***/ }),
+/* 297 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(6);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var MsgBox = function MsgBox(_ref) {
+  var msg = _ref.msg;
+  return _react2.default.createElement(
+    'div',
+    null,
+    _react2.default.createElement(
+      'textarea',
+      null,
+      msg
+    )
+  );
+};
+
+exports.default = MsgBox;
 
 /***/ })
 /******/ ]);
