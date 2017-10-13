@@ -9,30 +9,28 @@ const Main = ( { data }) => {
 
 return(
 	<div className="row">
-			<div className="col-sm-4">
+		{ data.data.length > 0 && data.data.map( (stock, idx) =>
+				(
+				<div key = { idx } className="col-sm-6">
+					<div className="panel panel-default">
+					<div className="panel-heading">{
+						stock.quotes.price.shortName } ( { stock.quotes.price.symbol } )
+						<span className = 'pull-right'>${ stock.quotes.price.regularMarketPrice}
+						<div>{ parseFloat(stock.quotes.price.regularMarketChange).toFixed(2) } {''}
+							({(parseFloat( (stock.quotes.price.regularMarketChangePercent*100).toFixed(2)) + "%" )})</div>
+						</span>
+						<div>&nbsp;</div>
+					</div>
 
-
-					{ data.data.length > 0 && data.data.map( (stock, idx) =>
-
-
-							(
-							<div key = { idx } className="panel panel-default">
-							<div className="panel-heading">{
-								stock.quotes.price.shortName }, {''}  { stock.quotes.price.symbol }
-							</div>
-							<div className="panel-body">
-								<div>Price: { stock.quotes.price.regularMarketPrice }</div>
-								<div> % change:{ parseFloat( (stock.quotes.price.regularMarketChangePercent*100).toFixed(2)) + "%" }</div>
-								<div>Ask Price:{ stock.quotes.summaryDetail.ask } &nbsp;&nbsp;&nbsp; Ask Size: { stock.quotes.summaryDetail.askSize }</div>
-								<div>Bid Price: { stock.quotes.summaryDetail.bid } &nbsp;&nbsp;&nbsp; Bid Size: { stock.quotes.summaryDetail.bidSize }</div>
-							</div>
-							</div>
-							)
-					  )
-				  }
-
-
-			</div>
+					<div className="panel-body">
+						<div>Ask:{ stock.quotes.summaryDetail.ask } &nbsp; x &nbsp; { stock.quotes.summaryDetail.askSize }</div>
+						<div>Bid: { stock.quotes.summaryDetail.bid } &nbsp; x &nbsp; { stock.quotes.summaryDetail.bidSize }</div>
+					</div>
+					</div>
+				</div>
+				)
+			)
+		}
 	</div>
 
 

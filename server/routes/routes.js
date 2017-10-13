@@ -21,7 +21,7 @@ router.get('/listOfStocks', (req, res, next) => {
 	res.send( nasdaqArray )
 })
 
-const portfolio = ['AAPL', 'FB', 'AMZN', 'BABA', 'TSLA'];
+const portfolio = ['AAPL', 'FB', 'AMZN', 'BABA', 'TSLA', 'GOOGL'];
 
 
 router.get('/portfolio', (req, res, next) => {
@@ -34,11 +34,11 @@ router.get('/portfolio', (req, res, next) => {
 	})
 	.then( quotes => stockArr.push( { quotes }))
 	.then( () => {
-		
+
 		if( stockArr.length === portfolio.length ){
 			let tempArr = [];
 			stockArr.forEach( dataPoint => {
-				tempArr.push( dataPoint.quotes.price.symbol );	
+				tempArr.push( dataPoint.quotes.price.symbol );
 			})
 			tempArr.sort();
 			let newArray = [];

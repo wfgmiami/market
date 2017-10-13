@@ -45,8 +45,8 @@ class App extends Component{
 		socket.on('sendData', ( ) => {
 			axios.get('/api/portfolio')
 			.then( response =>  response.data  )
-			.then( data =>{	
-			
+			.then( data =>{
+
 //			console.log('.............', data);
 			this.setState( { data } );
 			})
@@ -54,7 +54,7 @@ class App extends Component{
 	}
 
 	render(){
-//		console.log('///////////////////',this.state)
+		console.log('///////////////////',this.state)
 		return(
 			<div className="container">
 				<Header />
