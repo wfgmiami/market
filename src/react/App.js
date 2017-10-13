@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-
 import Header from './Header';
 import Main from './Main';
 import MsgBox from './MsgBox';
@@ -46,16 +45,16 @@ class App extends Component{
 		socket.on('sendData', ( ) => {
 			axios.get('/api/portfolio')
 			.then( response =>  response.data  )
-			.then( data => {
-				//const price = data.quotes.price;
-				//const summaryDetail = data.quotes.summaryDetail;
-				this.setState( { data } );
+			.then( data =>{	
+			
+//			console.log('.............', data);
+			this.setState( { data } );
 			})
 		})
 	}
 
 	render(){
-		//console.log(this.state)
+//		console.log('///////////////////',this.state)
 		return(
 			<div className="container">
 				<Header />

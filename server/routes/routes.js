@@ -34,9 +34,22 @@ router.get('/portfolio', (req, res, next) => {
 	})
 	.then( quotes => stockArr.push( { quotes }))
 	.then( () => {
+		
 		if( stockArr.length === portfolio.length ){
-			res.send( stockArr )
+			let tempArr = [];
+			stockArr.forEach( dataPoint => {
+				tempArr.push( dataPoint.quotes.price.symbol );	
+			})
+			tempArr.sort();
+			let newArray = [];
+			tempArr.forEach( item => {
+				newArray = newArray.concat( stockArr.filter( origObj => origObj.quotes.price.symbol === item ) );
+			})
+			return newArray;
 		}
+	})
+	.then( ( finalArr ) => {
+		if( finalArr ) res.send( finalArr )
 	})
 	.catch( next )
 

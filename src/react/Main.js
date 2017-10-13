@@ -5,6 +5,7 @@ import { render } from 'react-dom';
 
 
 const Main = ( { data }) => {
+//console.log('..............in Main.js', data.data);
 
 return(
 	<div className="row">
@@ -19,8 +20,11 @@ return(
 							<div className="panel-heading">{
 								stock.quotes.price.shortName }, {''}  { stock.quotes.price.symbol }
 							</div>
-							<div className="panel-body">Price: { stock.quotes.price.regularMarketPrice }
-								<div>% change:{ parseFloat( (stock.quotes.price.regularMarketChangePercent*100).toFixed(2)) + "%" }</div>
+							<div className="panel-body">
+								<div>Price: { stock.quotes.price.regularMarketPrice }</div>
+								<div> % change:{ parseFloat( (stock.quotes.price.regularMarketChangePercent*100).toFixed(2)) + "%" }</div>
+								<div>Ask Price:{ stock.quotes.summaryDetail.ask } &nbsp;&nbsp;&nbsp; Ask Size: { stock.quotes.summaryDetail.askSize }</div>
+								<div>Bid Price: { stock.quotes.summaryDetail.bid } &nbsp;&nbsp;&nbsp; Bid Size: { stock.quotes.summaryDetail.bidSize }</div>
 							</div>
 							</div>
 							)
@@ -33,6 +37,7 @@ return(
 
 
 	)
+
 }
 
 export default Main;
