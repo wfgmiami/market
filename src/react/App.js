@@ -9,7 +9,8 @@ import MsgBox from './MsgBox';
 // function subscriber(){
 	const socket = io(window.location.origin);
 	socket.on( 'connect', ()=> {
-		console.log(window.location.origin)
+		
+		socket.emit('joinRoom', window.location.origin);
 	})
 // 	socket.on('newPrices', console.log)
 // }
@@ -21,26 +22,30 @@ class App extends Component{
 
 
 		this.state = {
-			data: []
+			data: [],
+			msgs:[]
 		}
-
-		// subscriber( (err, msg) => this.setState({ msg }))
+		this.onMessageSubmit = this.onMessageSubmit.bind(this);
 	}
 
 	componentDidMount(){
-		// axios.get('/api/portfolio')
-		// 	.then( response =>  response.data  )
-		// 	.then( data => {
-		// 		//const price = data.quotes.price;
-		// 		//const summaryDetail = data.quotes.summaryDetail;
-		// 		this.setState( { data } );
-		// 		console.log('...........', this.state)
-		// 	} )'
 
 	}
 
 	componentWillMount(){
 		var self = this;
+		
+		socket.on('message', ( msgs ) => {
+
+			this.setState( { msgs } );
+//			console.log('socketstate.....', this.state.msgs);
+		})
+
+		socket.on('messageHistory', ( messages ) => {
+			messages.forEach ( ( msgs ) => {
+				this.setState( { msgs } )
+			})
+		})
 
 		socket.on('sendData', ( ) => {
 			axios.get('/api/portfolio')
@@ -50,16 +55,39 @@ class App extends Component{
 //			console.log('.............', data);
 			this.setState( { data } );
 			})
+			.catch( (err) => console.err )
 		})
+	}
+	
+
+	onMessageSubmit(msgs){
+		let tempArr = [];
+		if( this.state.msgs.length === 0 ){
+			tempArr.push( msgs );
+		}else{
+			tempArr = this.state.msgs;
+			tempArr.push( msgs );
+		}
+		msgs =  tempArr;
+		this.setState( {  msgs });
+
+		socket.emit('message', msgs);
 	}
 
 	render(){
-		console.log('///////////////////',this.state)
+//		console.log('///////////////////',this.state)
 		return(
 			<div className="container">
-				<Header />
-				<Main data = { this.state } />
-			</div>
+				<div className="row">
+					<Header />
+					<div className="col-sm-8">
+						<Main data = { this.state.data } />
+					</div>
+					<div className="col-sm-4">
+						<MsgBox msgs = { this.state.msgs } onMessageSubmit = { this.onMessageSubmit }  />
+					</div>
+				</div>
+			</div>	
 		)
 	}
 }

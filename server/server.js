@@ -23,13 +23,26 @@ app.use((err, req, res, next) => {
 	console.log(err);
 })
 
+var messages = {};
+var room;
 
 io.on( 'connection', (socket) => {
 
-		setInterval( () => {
-			socket.emit('sendData');
-		},1000)
+	setInterval( () => {
+		socket.emit('sendData');
+	},3000)
 
+	socket.on('joinRoom', (roomName) => {
+		room = roomName;
+		socket.join(roomName);
+		if( !messages[roomName] ) messages[roomName] = [];
+		else socket.emit('messageHistory', messages[roomName]);
+	})
+
+	socket.on('message',( msgs ) => {
+		messages[room].push( msgs );
+		socket.broadcast.emit('message', msgs );
+	})
 
 	socket.on('disconnect', () => {
 		console.log('Client has disconnected');
