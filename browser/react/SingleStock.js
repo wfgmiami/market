@@ -22,7 +22,7 @@ class SingleStock extends React.Component{
 
   render(){
     const quote = this.state.quote;
-    console.log('....in singleStock- quote',quote)
+    // console.log('....in singleStock- quote',quote)
     return(
       <div>
         { Object.keys(quote).length > 0 ?

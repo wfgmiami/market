@@ -23,7 +23,7 @@ class App extends Component{
 		this.state = {
 			msgs:[],
 			nasdaq:[],
-			quote: []
+			quote:[]
 		}
 
 		this.onMessageSubmit = this.onMessageSubmit.bind(this);
@@ -36,18 +36,6 @@ class App extends Component{
 		.catch( err => console.log( err ))
 
 
-	}
-
-	componentDidUpdate(){
-		let quote = [];
-		if(	Object.keys( this.props ).length > 1 && quote.length > 0){
-			console.log('..quote', quote)
-			this.setState({ quote });
-		}else if( Object.keys( this.props ).length < 2  && quote.length === 0){
-			quote = this.props.router.match.params.symbol;
-			console.log('..quote', quote)
-			this.setState({ quote });
-		}
 	}
 
 	componentWillMount(){
@@ -64,14 +52,15 @@ class App extends Component{
 
 		socket.on('sendData', ( ) => {
 
-			const symbol = this.state.quote;
-			console.log('...socket.on, symbol', symbol)
-			// if( symbol.length > 0 ){
-			// 	axios.get(`/api/quote/${ symbol }`)
-			// 	.then( response => response.data )
-			// 	.then ( quote => this.setState( { quote } ))
-			// 	.catch( err => console.log( err ))
-			// }
+
+			if( Object.keys( this.props ).length < 2 ){
+				this.setState( { quote:[] } )
+
+				// axios.get(`/api/quote/${ symbol }`)
+				// .then( response => response.data )
+				// .then ( quote => this.setState( { quote } ))
+				// .catch( err => console.log( err ))
+			}
 
 		})
 	}
@@ -93,7 +82,7 @@ class App extends Component{
 
 
 	render(){
-	console.log('.....in App.js, state, props',this.state, this.props)
+	// console.log('.....in App.js, state, props',this.state, this.props)
 
 		return(
 			<div className="container-fluid">

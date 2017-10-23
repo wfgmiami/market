@@ -29818,19 +29818,6 @@ var App = function (_Component) {
 			});
 		}
 	}, {
-		key: 'componentDidUpdate',
-		value: function componentDidUpdate() {
-			var quote = [];
-			if (Object.keys(this.props).length > 1 && quote.length > 0) {
-				console.log('..quote', quote);
-				this.setState({ quote: quote });
-			} else if (Object.keys(this.props).length < 2 && quote.length === 0) {
-				quote = this.props.router.match.params.symbol;
-				console.log('..quote', quote);
-				this.setState({ quote: quote });
-			}
-		}
-	}, {
 		key: 'componentWillMount',
 		value: function componentWillMount() {
 			var _this3 = this;
@@ -29848,14 +29835,14 @@ var App = function (_Component) {
 
 			socket.on('sendData', function () {
 
-				var symbol = _this3.state.quote;
-				console.log('...socket.on, symbol', symbol);
-				// if( symbol.length > 0 ){
-				// 	axios.get(`/api/quote/${ symbol }`)
-				// 	.then( response => response.data )
-				// 	.then ( quote => this.setState( { quote } ))
-				// 	.catch( err => console.log( err ))
-				// }
+				if (Object.keys(_this3.props).length < 2) {
+					_this3.setState({ quote: [] });
+
+					// axios.get(`/api/quote/${ symbol }`)
+					// .then( response => response.data )
+					// .then ( quote => this.setState( { quote } ))
+					// .catch( err => console.log( err ))
+				}
 			});
 		}
 	}, {
@@ -29876,7 +29863,7 @@ var App = function (_Component) {
 	}, {
 		key: 'render',
 		value: function render() {
-			console.log('.....in App.js, state, props', this.state, this.props);
+			// console.log('.....in App.js, state, props',this.state, this.props)
 
 			return _react2.default.createElement(
 				'div',
@@ -31527,7 +31514,7 @@ var SingleStock = function (_React$Component) {
     key: 'render',
     value: function render() {
       var quote = this.state.quote;
-      console.log('....in singleStock- quote', quote);
+      // console.log('....in singleStock- quote',quote)
       return _react2.default.createElement(
         'div',
         null,
