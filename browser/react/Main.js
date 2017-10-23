@@ -1,16 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { render } from 'react-dom';
-import MsgBox from './MsgBox';
 
 
 const Main = ( { data }) => {
 //console.log('..............in Main.js', data.data);
 
 return(
-	<div>	
+	<div>
 		{ data.length > 0 && data.map( (stock, idx) =>
-				(	
+				(
 					<div key = { idx } className="panel panel-default">
 					<div className="panel-heading">{ stock.quotes.price.shortName } ( { stock.quotes.price.symbol } )
 						<span className = 'pull-right'>${ stock.quotes.price.regularMarketPrice}
@@ -28,7 +26,7 @@ return(
 					</div>
 				)
 		)}
-	</div>			
+	</div>
 	)
 }
 

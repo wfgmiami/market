@@ -1,18 +1,18 @@
 module.exports = {
-	entry: './src/react/index.js',
+	entry: './browser/react/index.js',
 	output: {
-		path: __dirname + '/dist',
-		filename: 'bundle.js'
+		path: __dirname,
+		filename: './public/bundle.js'
 	},
-	devtool: 'sourcemap',
+	devtool: 'source-map',
 	module: {
 		loaders:[
 			{ test: /\.js$/,
 			  exclude: /node_modules/,
 			  loader: 'babel-loader',
-			  query: { presets: ['es2015', 'react'] }	
+			  query: { presets: ['es2015', 'react'] }
 			}
-		]	
+		]
 	}
 
 }
