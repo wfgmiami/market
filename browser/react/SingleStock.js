@@ -20,12 +20,21 @@ class SingleStock extends React.Component{
     .catch( err => console.log( err ))
   }
 
+  componentDidUpdate(){
+   const symbol = this.props.router.match.params.symbol;
+
+    axios.get(`/api/quote/${ symbol }`)
+    .then( response => response.data )
+    .then ( quote => this.setState( { quote } ))
+    .catch( err => console.log( err ))
+  }
+  	  
   render(){
     const quote = this.state.quote;
     // console.log('....in singleStock- quote',quote)
     return(
       <div>
-        { Object.keys(quote).length > 0 ?
+        { Object.keys(quote).length > 0 && (quote.summaryDetail) ?
         <div className="panel panel-default">
         <div className="panel-heading">{ quote.price.shortName } ( { quote.price.symbol } )
           <span className = 'pull-right'>${ quote.price.regularMarketPrice}
@@ -42,7 +51,13 @@ class SingleStock extends React.Component{
           <span className = 'pull-right'><button className="btn btn-primary"><Link to="/">Back</Link></button></span>
         </div>
         </div>
-          : null }
+          : 
+		   <div className="panel panel-default">
+        	<div className="panel-heading">NO DATA AVAILABLE
+            </div>
+			 <span className = 'pull-right'><button className="btn btn-primary"><Link to="/">Back</Link></button></span>
+           </div>
+ 		}
       </div>
     )
   }

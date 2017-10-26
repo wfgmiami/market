@@ -29782,6 +29782,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var socket = io(window.location.origin);
+var clientIP = '';
+
 socket.on('connect', function () {
 	socket.emit('joinRoom', window.location.origin);
 });
@@ -29797,22 +29799,72 @@ var App = function (_Component) {
 		_this.state = {
 			msgs: [],
 			nasdaq: [],
-			quote: []
+			quote: [],
+			search: ''
 		};
-
+		_this.reset = _this.reset.bind(_this);
+		_this.searchActive = _this.searchActive.bind(_this);
+		_this.filterActive = _this.filterActive.bind(_this);
 		_this.onMessageSubmit = _this.onMessageSubmit.bind(_this);
 		return _this;
 	}
 
 	_createClass(App, [{
+		key: 'searchActive',
+		value: function searchActive(input) {
+			var _this2 = this;
+
+			var searchedStock = { "searchedStock": input
+				//		console.log('in searchActive.....',searchedStock);
+			};_axios2.default.get('/api/stocks/nasdaq/search', { params: searchedStock }).then(function (res) {
+				return res.data;
+			}).then(function (nasdaq) {
+				_this2.setState({ nasdaq: nasdaq });
+				_this2.setState({ search: true });
+			}).catch(function (err) {
+				return console.log(err);
+			});
+		}
+	}, {
+		key: 'filterActive',
+		value: function filterActive(filter) {
+			var _this3 = this;
+
+			var url = '/api/stocks/nasdaq/filter';
+			if (filter.sector.length === 0) {
+				url = '/api/stocks/nasdaq';
+			}
+			_axios2.default.get(url, { params: filter }).then(function (res) {
+				return res.data;
+			}).then(function (nasdaq) {
+				return _this3.setState({ nasdaq: nasdaq });
+			}).catch(function (err) {
+				return console.log(err);
+			});
+		}
+	}, {
 		key: 'componentDidMount',
 		value: function componentDidMount() {
-			var _this2 = this;
+			var _this4 = this;
 
 			_axios2.default.get('/api/stocks/nasdaq').then(function (response) {
 				return response.data;
 			}).then(function (nasdaq) {
-				return _this2.setState({ nasdaq: nasdaq });
+				return _this4.setState({ nasdaq: nasdaq });
+			}).catch(function (err) {
+				return console.log(err);
+			});
+		}
+	}, {
+		key: 'reset',
+		value: function reset() {
+			var _this5 = this;
+
+			_axios2.default.get('/api/stocks/nasdaq').then(function (response) {
+				return response.data;
+			}).then(function (nasdaq) {
+				_this5.setState({ nasdaq: nasdaq });
+				_this5.setState({ search: false });
 			}).catch(function (err) {
 				return console.log(err);
 			});
@@ -29820,28 +29872,27 @@ var App = function (_Component) {
 	}, {
 		key: 'componentWillMount',
 		value: function componentWillMount() {
-			var _this3 = this;
+			var _this6 = this;
 
 			var self = this;
 			socket.on('message', function (msgs) {
-				_this3.setState({ msgs: msgs });
+				_this6.setState({ msgs: msgs });
+			});
+
+			socket.on('ip', function (clientAddress) {
+				clientIP = clientAddress;
 			});
 
 			socket.on('messageHistory', function (messages) {
 				messages.forEach(function (msgs) {
-					_this3.setState({ msgs: msgs });
+					_this6.setState({ msgs: msgs });
 				});
 			});
-
 			socket.on('sendData', function () {
 
-				if (Object.keys(_this3.props).length < 2) {
-					_this3.setState({ quote: [] });
-
-					// axios.get(`/api/quote/${ symbol }`)
-					// .then( response => response.data )
-					// .then ( quote => this.setState( { quote } ))
-					// .catch( err => console.log( err ))
+				if (Object.keys(_this6.props).length < 2) {
+					_this6.setState({ quote: [] });
+					//				console.log('......sendData.....', this.props, this.state);
 				}
 			});
 		}
@@ -29849,6 +29900,7 @@ var App = function (_Component) {
 		key: 'onMessageSubmit',
 		value: function onMessageSubmit(msgs) {
 			var tempArr = [];
+			msgs = clientIP + ': ' + msgs;
 			if (this.state.msgs.length === 0) {
 				tempArr.push(msgs);
 			} else {
@@ -29872,19 +29924,19 @@ var App = function (_Component) {
 				_react2.default.createElement(
 					'div',
 					{ style: { marginTop: '65px' } },
-					_react2.default.createElement(_SearchBar2.default, null),
+					_react2.default.createElement(_SearchBar2.default, { searchActive: this.searchActive }),
 					_react2.default.createElement(
 						'div',
 						{ className: 'row' },
 						_react2.default.createElement(
 							'div',
 							{ className: 'col-sm-2' },
-							_react2.default.createElement(_FilterBar2.default, null)
+							_react2.default.createElement(_FilterBar2.default, { filterActive: this.filterActive })
 						),
 						_react2.default.createElement(
 							'div',
 							{ className: 'col-sm-6' },
-							Object.keys(this.props).length > 1 ? _react2.default.createElement(_StocksList2.default, { nasdaq: this.state.nasdaq }) : _react2.default.createElement(_SingleStock2.default, { router: this.props.router })
+							Object.keys(this.props).length > 1 ? _react2.default.createElement(_StocksList2.default, { searchFlag: this.state.search, reset: this.reset, nasdaq: this.state.nasdaq }) : _react2.default.createElement(_SingleStock2.default, { router: this.props.router })
 						),
 						_react2.default.createElement(
 							'div',
@@ -30829,7 +30881,7 @@ var Nav = function (_React$Component) {
                 _react2.default.createElement('span', { className: 'icon-bar' })
               ),
               _react2.default.createElement(
-                'c',
+                'div',
                 { className: 'navbar-brand' },
                 _react2.default.createElement(
                   _reactRouterDom.Link,
@@ -30859,19 +30911,11 @@ var Nav = function (_React$Component) {
                   null,
                   _react2.default.createElement(
                     'a',
-                    { href: '#' },
+                    { href: 'https://github.com/wfgmiami/market' },
                     'Github'
                   )
                 ),
-                _react2.default.createElement(
-                  'li',
-                  null,
-                  _react2.default.createElement(
-                    _reactRouterDom.Link,
-                    { to: '#' },
-                    'Trade Orders'
-                  )
-                )
+                _react2.default.createElement('li', null)
               ),
               _react2.default.createElement(
                 'ul',
@@ -31039,7 +31083,7 @@ var MsgBox = function (_React$Component) {
 	}, {
 		key: 'handleSubmit',
 		value: function handleSubmit(e) {
-			var msg = "Guest: " + this.state.msg;
+			var msg = this.state.msg;
 			this.props.onMessageSubmit(msg);
 			e.preventDefault();
 			//		let msg = '';
@@ -31071,7 +31115,11 @@ var MsgBox = function (_React$Component) {
 					_react2.default.createElement(
 						'label',
 						null,
-						'Message Board'
+						_react2.default.createElement(
+							'u',
+							null,
+							'Message Board'
+						)
 					)
 				),
 				_react2.default.createElement(
@@ -31082,20 +31130,16 @@ var MsgBox = function (_React$Component) {
 					_react2.default.createElement(
 						'div',
 						{ id: 'msgBox', className: 'panel-footer', style: { overflowX: "hidden", overflowY: 'auto' } },
-						_react2.default.createElement(
-							'ul',
-							null,
-							this.updateScroll,
-							this.props.msgs.map(function (msg, idx) {
-								return _react2.default.createElement(
-									'li',
-									{ key: idx, style: { listStyleType: 'none' } },
-									' ',
-									msg,
-									' '
-								);
-							})
-						)
+						this.updateScroll,
+						this.props.msgs.map(function (msg, idx) {
+							return _react2.default.createElement(
+								'div',
+								{ key: idx },
+								' ',
+								msg,
+								' '
+							);
+						})
 					)
 				),
 				_react2.default.createElement(
@@ -31152,7 +31196,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var category = ['Consumer Services', 'Finance', 'Technology', 'Public Utilities', 'Captial Goods', 'Basic Industries', 'Health Care', 'Energy'];
+var category = ['Consumer Services', 'Finance', 'Technology', 'Public Utilities', 'Capital Goods', 'Basic Industries', 'Health Care', 'Energy', 'Transportation', 'Miscellaneous', 'Consumer Non-Durables'];
+category = category.sort();
 
 var FilterBar = function (_React$Component) {
   _inherits(FilterBar, _React$Component);
@@ -31178,7 +31223,7 @@ var FilterBar = function (_React$Component) {
 
       var filter = (0, _modfilter.createNewFilter)(this.state.filter, name, value);
       this.setState(filter);
-      this.props.changeFilter(1, filter);
+      this.props.filterActive(filter);
     }
   }, {
     key: 'render',
@@ -31339,10 +31384,30 @@ var SearchBar = function (_React$Component) {
   function SearchBar(props) {
     _classCallCheck(this, SearchBar);
 
-    return _possibleConstructorReturn(this, (SearchBar.__proto__ || Object.getPrototypeOf(SearchBar)).call(this, props));
+    var _this = _possibleConstructorReturn(this, (SearchBar.__proto__ || Object.getPrototypeOf(SearchBar)).call(this, props));
+
+    _this.state = {
+      searchedStock: ''
+    };
+
+    _this.handleSubmit = _this.handleSubmit.bind(_this);
+    _this.inputChange = _this.inputChange.bind(_this);
+    return _this;
   }
 
   _createClass(SearchBar, [{
+    key: 'inputChange',
+    value: function inputChange(e) {
+      this.setState({ searchedStock: e.target.value });
+    }
+  }, {
+    key: 'handleSubmit',
+    value: function handleSubmit(ev) {
+      this.props.searchActive(this.state.searchedStock);
+      ev.preventDefault();
+      this.setState({ searchedStock: '' });
+    }
+  }, {
     key: 'render',
     value: function render() {
       return _react2.default.createElement(
@@ -31354,13 +31419,13 @@ var SearchBar = function (_React$Component) {
           _react2.default.createElement(
             'div',
             { className: 'input-group' },
-            _react2.default.createElement('input', { className: 'form-control', placeholder: 'Enter Company', type: 'text' }),
+            _react2.default.createElement('input', { className: 'form-control', placeholder: 'Enter Company Name', type: 'text', value: this.state.searchedStock, onChange: this.inputChange }),
             _react2.default.createElement(
               'span',
               { className: 'input-group-btn' },
               _react2.default.createElement(
                 'button',
-                { className: 'btn btn-default', type: 'submit' },
+                { className: 'btn btn-default', type: 'submit', onClick: this.handleSubmit },
                 _react2.default.createElement('span', { className: 'glyphicon glyphicon-search' })
               )
             )
@@ -31395,56 +31460,88 @@ var _reactRouterDom = __webpack_require__(25);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var StocksList = function StocksList(_ref) {
-	var nasdaq = _ref.nasdaq;
+	var nasdaq = _ref.nasdaq,
+	    searchFlag = _ref.searchFlag,
+	    reset = _ref.reset;
 
 	// console.log('..............in StocksList.js', nasdaq);
+	var total = nasdaq.length;
 
 	return _react2.default.createElement(
 		'div',
-		{ style: { maxHeight: '80vh', overflowY: 'auto' } },
-		nasdaq.length > 0 && nasdaq.map(function (stock, idx) {
-			return _react2.default.createElement(
-				'div',
-				{ key: idx, className: 'panel panel-default' },
+		{ className: 'panel-footer' },
+		_react2.default.createElement(
+			'b',
+			null,
+			'NASDAQ listed stocks: ',
+			_react2.default.createElement(
+				'span',
+				{ className: 'badge badge-info' },
+				' ',
+				total
+			),
+			searchFlag ? _react2.default.createElement(
+				'span',
+				{ className: 'pull-right' },
 				_react2.default.createElement(
-					'div',
-					{ style: { overflowX: "hidden", overflowY: 'auto' }, className: 'panel-heading' },
-					_react2.default.createElement(
-						_reactRouterDom.Link,
-						{ to: 'api/quote/' + stock.symbol },
-						' ',
-						stock.name,
-						' ( ',
-						stock.symbol,
-						' )'
-					)
-				),
-				_react2.default.createElement(
-					'div',
-					{ className: 'panel-body' },
-					_react2.default.createElement(
-						'div',
-						null,
-						'Sector:',
-						stock.sector,
-						' '
-					),
-					_react2.default.createElement(
-						'div',
-						null,
-						'Industry: ',
-						stock.industry
-					),
-					_react2.default.createElement(
-						'div',
-						null,
-						'IPO: ',
-						stock.ipo,
-						' '
-					)
+					'button',
+					{ className: 'btn btn-primary', onClick: reset },
+					'Reset'
 				)
-			);
-		})
+			) : null
+		),
+		_react2.default.createElement(
+			'div',
+			null,
+			'\xA0'
+		),
+		_react2.default.createElement(
+			'div',
+			{ style: { maxHeight: '80vh', overflowY: 'auto' } },
+			nasdaq.length > 0 && nasdaq.map(function (stock, idx) {
+				return _react2.default.createElement(
+					'div',
+					{ key: idx, className: 'panel panel-default' },
+					_react2.default.createElement(
+						'div',
+						{ style: { overflowX: "hidden", overflowY: 'auto' }, className: 'panel-heading' },
+						_react2.default.createElement(
+							_reactRouterDom.Link,
+							{ to: 'api/quote/' + stock.symbol },
+							' ',
+							stock.name,
+							' ( ',
+							stock.symbol,
+							' )'
+						)
+					),
+					_react2.default.createElement(
+						'div',
+						{ className: 'panel-body' },
+						_react2.default.createElement(
+							'div',
+							null,
+							'Sector:',
+							stock.sector,
+							' '
+						),
+						_react2.default.createElement(
+							'div',
+							null,
+							'Industry: ',
+							stock.industry
+						),
+						_react2.default.createElement(
+							'div',
+							null,
+							'IPO: ',
+							stock.ipo,
+							' '
+						)
+					)
+				);
+			})
+		)
 	);
 };
 
@@ -31511,6 +31608,21 @@ var SingleStock = function (_React$Component) {
       });
     }
   }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate() {
+      var _this3 = this;
+
+      var symbol = this.props.router.match.params.symbol;
+
+      _axios2.default.get('/api/quote/' + symbol).then(function (response) {
+        return response.data;
+      }).then(function (quote) {
+        return _this3.setState({ quote: quote });
+      }).catch(function (err) {
+        return console.log(err);
+      });
+    }
+  }, {
     key: 'render',
     value: function render() {
       var quote = this.state.quote;
@@ -31518,7 +31630,7 @@ var SingleStock = function (_React$Component) {
       return _react2.default.createElement(
         'div',
         null,
-        Object.keys(quote).length > 0 ? _react2.default.createElement(
+        Object.keys(quote).length > 0 && quote.summaryDetail ? _react2.default.createElement(
           'div',
           { className: 'panel panel-default' },
           _react2.default.createElement(
@@ -31583,7 +31695,28 @@ var SingleStock = function (_React$Component) {
               )
             )
           )
-        ) : null
+        ) : _react2.default.createElement(
+          'div',
+          { className: 'panel panel-default' },
+          _react2.default.createElement(
+            'div',
+            { className: 'panel-heading' },
+            'NO DATA AVAILABLE'
+          ),
+          _react2.default.createElement(
+            'span',
+            { className: 'pull-right' },
+            _react2.default.createElement(
+              'button',
+              { className: 'btn btn-primary' },
+              _react2.default.createElement(
+                _reactRouterDom.Link,
+                { to: '/' },
+                'Back'
+              )
+            )
+          )
+        )
       );
     }
   }]);

@@ -7,11 +7,42 @@ const nasdaqData = require( '../../../nasdaq.json');
 module.exports = router;
 
 router.get('/nasdaq', (req, res, next) => {
+	res.send( createNewObject( nasdaqData ));
+})
 
+
+router.get('/nasdaq/filter', (req, res, next) => {
+
+	const { sector } = req.query;
+	let filteredArray = [];
+	sector.forEach( sect => {
+		let tempArray = nasdaqData.filter( stock => stock.Sector === sect );
+		filteredArray = filteredArray.concat( tempArray );
+	})
+
+	res.send( createNewObject( filteredArray ));
+})
+
+router.get('/nasdaq/search', (req, res, next) => {
+
+	let searchedArray = [];
+	const { searchedStock } =  req.query;
+	
+	nasdaqData.forEach( stock => {
+		if( stock.Name.toUpperCase().indexOf( searchedStock.toUpperCase() ) > -1 ){
+			searchedArray.push( stock );
+		}
+	})
+//	searchedArray = nasdaqData.filter( stock => stock.Name === searchedStock );
+	res.send( createNewObject( searchedArray ));
+})
+
+
+createNewObject = ( arr ) => {
 	let obj = {};
 	let nasdaq = [];
 
-	nasdaqData.forEach( item => {
+	arr.forEach( item => {
 		obj.symbol = item.Symbol;
 		obj.name = item.Name;
 		obj.sector = item.Sector;
@@ -20,8 +51,6 @@ router.get('/nasdaq', (req, res, next) => {
 		nasdaq.push(obj)
 		obj= {};
 	})
-
-	res.send( nasdaq )
-})
-
+	return nasdaq;
+}
 

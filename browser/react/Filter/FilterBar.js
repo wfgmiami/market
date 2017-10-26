@@ -2,8 +2,9 @@ import React from 'react';
 import FilterGroup from './FilterGroup';
 import { createNewFilter } from './modfilter';
 
-const category = ['Consumer Services', 'Finance', 'Technology', 'Public Utilities',
-'Captial Goods', 'Basic Industries', 'Health Care', 'Energy'];
+let category = ['Consumer Services', 'Finance', 'Technology', 'Public Utilities',
+'Capital Goods', 'Basic Industries', 'Health Care', 'Energy', 'Transportation', 'Miscellaneous','Consumer Non-Durables'];
+category = category.sort();
 
 class FilterBar extends React.Component {
   constructor(props) {
@@ -18,7 +19,7 @@ class FilterBar extends React.Component {
   modFilter({ name, value }) {
     const filter = createNewFilter( this.state.filter, name, value );
     this.setState( filter );
-    this.props.changeFilter( 1, filter );
+    this.props.filterActive( filter );
   }
 
 

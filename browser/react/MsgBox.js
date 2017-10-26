@@ -20,7 +20,7 @@ class MsgBox extends React.Component{
 	}
 
 	handleSubmit(e){
-		let msg = "Guest: " + this.state.msg;
+		let msg = this.state.msg;
 		this.props.onMessageSubmit( msg );
 		e.preventDefault();
 //		let msg = '';
@@ -43,21 +43,21 @@ class MsgBox extends React.Component{
 			<div>
 				<div className="panel-footer" >
 				<label>
-					Message Board
+					<u>Message Board</u>
 				</label>
 				</div>
 
 			<div style={{ maxHeight:'300px', overflowY:'auto' }} ref={ (div) => { this.messageList = div } } >
 				<div id="msgBox" className="panel-footer" style={{ overflowX: "hidden", overflowY:'auto' }}>
-				<ul>
-			{ this.updateScroll }	
+				
+				{ this.updateScroll }	
 				{ this.props.msgs.map( ( msg, idx ) => {
 					return(
-						<li key = { idx } style={{ listStyleType: 'none' }}> { msg } </li>	
+						<div key = { idx } > { msg } </div>	
 					)
 				  })
 				}	
-		 		</ul>
+		 		
 				</div>
 			</div>
 

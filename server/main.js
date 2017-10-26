@@ -11,12 +11,14 @@ const createApplication = () => {
 
 	let messages = {};
 	let room;
+	let clientIP;
 
 	io.on( 'connection', (socket) => {
-
+		clientIP = socket.handshake.address.substring(7);
 		setInterval( () => {
 			socket.emit('sendData');
 		},1000)
+		socket.emit('ip', clientIP);
 
 		socket.on('joinRoom', (roomName) => {
 			room = roomName;
@@ -26,6 +28,7 @@ const createApplication = () => {
 		})
 
 		socket.on('message',( msgs ) => {
+			
 			messages[room].push( msgs );
 			socket.broadcast.emit('message', msgs );
 		})

@@ -17,21 +17,19 @@ class Nav extends React.Component {
                 <span className="icon-bar" />
                 <span className="icon-bar" />
               </button>
-              <c className="navbar-brand"><Link to="/">Investing World</Link></c>
+              <div className="navbar-brand"><Link to="/">Investing World</Link></div>
             </div>
             <div className="collapse navbar-collapse">
               <ul className="nav navbar-nav">
                 <li>
-                  <a href="#">
-                    Portfolio
-                  </a>
+                  <a href="#">Portfolio</a>
                 </li>
                 <li className="divider" />
                 <li>
-                  <a href="#">Github</a>
+                  <a href="https://github.com/wfgmiami/market">Github</a>
                 </li>
                 <li>
-                  <Link to="#">Trade Orders</Link>
+                 
                 </li>
               </ul>
               <ul className="nav navbar-nav navbar-right">

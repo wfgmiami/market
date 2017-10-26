@@ -1,11 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const StocksList = ( { nasdaq }) => {
+const StocksList = ( { nasdaq, searchFlag, reset }) => {
 // console.log('..............in StocksList.js', nasdaq);
+const total = nasdaq.length;
 
 return(
-	<div style={{ maxHeight:'80vh', overflowY:'auto' }} >
+	<div className="panel-footer"><b>NASDAQ listed stocks: <span className="badge badge-info"> { total }</span>{ searchFlag ? <span className="pull-right"><button className="btn btn-primary" onClick={ reset }>Reset</button></span> : null }</b>  
+	<div>&nbsp;</div>
+	<div style={{ maxHeight:'80vh', overflowY:'auto' }} >		
 		{ nasdaq.length > 0 && nasdaq.map( (stock, idx) =>
 				(
 					<div key = { idx } className="panel panel-default" >
@@ -19,6 +22,7 @@ return(
 					</div>
 				)
 		)}
+	</div>
 	</div>
 	)
 }
