@@ -17,7 +17,7 @@ socket.on( 'connect', ()=> {
 	socket.emit('joinRoom', window.location.origin);
 })
 
-
+//comment
 class App extends Component{
 	constructor( props ){
 		super( props );

@@ -29788,6 +29788,8 @@ socket.on('connect', function () {
 	socket.emit('joinRoom', window.location.origin);
 });
 
+//comment
+
 var App = function (_Component) {
 	_inherits(App, _Component);
 
