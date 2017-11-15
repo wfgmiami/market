@@ -29784,6 +29784,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var socket = io(window.location.origin);
 var clientIP = '';
 
+var divOuter = void 0;
+var divInner = void 0;
+
 socket.on('connect', function () {
 	socket.emit('joinRoom', window.location.origin);
 });
@@ -29806,6 +29809,7 @@ var App = function (_Component) {
 		_this.searchActive = _this.searchActive.bind(_this);
 		_this.filterActive = _this.filterActive.bind(_this);
 		_this.onMessageSubmit = _this.onMessageSubmit.bind(_this);
+		_this.handleScroll = _this.handleScroll.bind(_this);
 		return _this;
 	}
 
@@ -29847,6 +29851,11 @@ var App = function (_Component) {
 		value: function componentDidMount() {
 			var _this4 = this;
 
+			divOuter = document.getElementById("divOuter");
+			divInner = document.getElementById("divInner");
+
+			divOuter.addEventListener("scroll", this.handleScroll);
+
 			_axios2.default.get('/api/stocks/nasdaq').then(function (response) {
 				return response.data;
 			}).then(function (nasdaq) {
@@ -29856,15 +29865,43 @@ var App = function (_Component) {
 			});
 		}
 	}, {
+		key: 'componentWillUnmount',
+		value: function componentWillUnmount() {
+			window.removeEventListener("scroll", this.handleScroll);
+		}
+	}, {
+		key: 'handleScroll',
+		value: function handleScroll(event) {
+			var _this5 = this;
+
+			var currentY = divOuter.scrollTop;
+			var posHeight = divOuter.clientHeight;
+			var scrollHeight = divInner.clientHeight;
+
+			var scrollPercentage = currentY / (scrollHeight - posHeight) * 100;
+
+			console.log('.....', scrollPercentage, currentY, posHeight, scrollHeight);
+
+			if (scrollPercentage > 0.9) {
+				_axios2.default.get('/api/stocks/nasdaq').then(function (response) {
+					return response.data;
+				}).then(function (nasdaq) {
+					return _this5.setState({ nasdaq: nasdaq });
+				}).catch(function (err) {
+					return console.log(err);
+				});
+			}
+		}
+	}, {
 		key: 'reset',
 		value: function reset() {
-			var _this5 = this;
+			var _this6 = this;
 
 			_axios2.default.get('/api/stocks/nasdaq').then(function (response) {
 				return response.data;
 			}).then(function (nasdaq) {
-				_this5.setState({ nasdaq: nasdaq });
-				_this5.setState({ search: false });
+				_this6.setState({ nasdaq: nasdaq });
+				_this6.setState({ search: false });
 			}).catch(function (err) {
 				return console.log(err);
 			});
@@ -29872,11 +29909,11 @@ var App = function (_Component) {
 	}, {
 		key: 'componentWillMount',
 		value: function componentWillMount() {
-			var _this6 = this;
+			var _this7 = this;
 
 			var self = this;
 			socket.on('message', function (msgs) {
-				_this6.setState({ msgs: msgs });
+				_this7.setState({ msgs: msgs });
 			});
 
 			socket.on('ip', function (clientAddress) {
@@ -29885,13 +29922,13 @@ var App = function (_Component) {
 
 			socket.on('messageHistory', function (messages) {
 				messages.forEach(function (msgs) {
-					_this6.setState({ msgs: msgs });
+					_this7.setState({ msgs: msgs });
 				});
 			});
 			socket.on('sendData', function () {
 
-				if (Object.keys(_this6.props).length < 2) {
-					_this6.setState({ quote: [] });
+				if (Object.keys(_this7.props).length < 2) {
+					_this7.setState({ quote: [] });
 					//				console.log('......sendData.....', this.props, this.state);
 				}
 			});
@@ -29935,12 +29972,12 @@ var App = function (_Component) {
 						),
 						_react2.default.createElement(
 							'div',
-							{ className: 'col-sm-6' },
+							{ className: 'col-sm-8' },
 							Object.keys(this.props).length > 1 ? _react2.default.createElement(_StocksList2.default, { searchFlag: this.state.search, reset: this.reset, nasdaq: this.state.nasdaq }) : _react2.default.createElement(_SingleStock2.default, { router: this.props.router })
 						),
 						_react2.default.createElement(
 							'div',
-							{ className: 'col-sm-4' },
+							{ className: 'col-sm-2' },
 							_react2.default.createElement(_MsgBox2.default, { msgs: this.state.msgs, onMessageSubmit: this.onMessageSubmit })
 						)
 					)
@@ -30886,7 +30923,7 @@ var Nav = function (_React$Component) {
                 _react2.default.createElement(
                   _reactRouterDom.Link,
                   { to: '/' },
-                  'Investing World'
+                  'NASDAQ LISTED STOCK'
                 )
               )
             ),
@@ -30896,41 +30933,12 @@ var Nav = function (_React$Component) {
               _react2.default.createElement(
                 'ul',
                 { className: 'nav navbar-nav' },
-                _react2.default.createElement(
-                  'li',
-                  null,
-                  _react2.default.createElement(
-                    'a',
-                    { href: '#' },
-                    'Portfolio'
-                  )
-                ),
-                _react2.default.createElement('li', { className: 'divider' }),
-                _react2.default.createElement(
-                  'li',
-                  null,
-                  _react2.default.createElement(
-                    'a',
-                    { href: 'https://github.com/wfgmiami/market' },
-                    'Github'
-                  )
-                ),
                 _react2.default.createElement('li', null)
               ),
               _react2.default.createElement(
                 'ul',
                 { className: 'nav navbar-nav navbar-right' },
-                _react2.default.createElement(
-                  'li',
-                  { className: '' },
-                  _react2.default.createElement(
-                    _reactRouterDom.Link,
-                    { to: '#' },
-                    _react2.default.createElement('span', { className: 'glyphicon glyphicon-heart' }),
-                    ' ',
-                    'Sign Up'
-                  )
-                )
+                _react2.default.createElement('li', { className: '' })
               )
             )
           )
@@ -31464,7 +31472,7 @@ var StocksList = function StocksList(_ref) {
 	    searchFlag = _ref.searchFlag,
 	    reset = _ref.reset;
 
-	// console.log('..............in StocksList.js', nasdaq);
+	// console.log('..............in StocksList.js',searchFlag, nasdaq);
 	var total = nasdaq.length;
 
 	return _react2.default.createElement(
@@ -31473,7 +31481,7 @@ var StocksList = function StocksList(_ref) {
 		_react2.default.createElement(
 			'b',
 			null,
-			'NASDAQ listed stocks: ',
+			'Total listed stocks: ',
 			_react2.default.createElement(
 				'span',
 				{ className: 'badge badge-info' },
@@ -31496,51 +31504,88 @@ var StocksList = function StocksList(_ref) {
 			'\xA0'
 		),
 		_react2.default.createElement(
-			'div',
-			{ style: { maxHeight: '80vh', overflowY: 'auto' } },
-			nasdaq.length > 0 && nasdaq.map(function (stock, idx) {
-				return _react2.default.createElement(
-					'div',
-					{ key: idx, className: 'panel panel-default' },
+			'table',
+			{ style: { width: "100%" } },
+			_react2.default.createElement(
+				'thead',
+				null,
+				_react2.default.createElement(
+					'tr',
+					null,
 					_react2.default.createElement(
-						'div',
-						{ style: { overflowX: "hidden", overflowY: 'auto' }, className: 'panel-heading' },
-						_react2.default.createElement(
-							_reactRouterDom.Link,
-							{ to: 'api/quote/' + stock.symbol },
-							' ',
-							stock.name,
-							' ( ',
-							stock.symbol,
-							' )'
-						)
+						'th',
+						{ className: 'symbol' },
+						'Symbol'
 					),
 					_react2.default.createElement(
-						'div',
-						{ className: 'panel-body' },
-						_react2.default.createElement(
-							'div',
-							null,
-							'Sector:',
-							stock.sector,
-							' '
-						),
-						_react2.default.createElement(
-							'div',
-							null,
-							'Industry: ',
-							stock.industry
-						),
-						_react2.default.createElement(
-							'div',
-							null,
-							'IPO: ',
-							stock.ipo,
-							' '
-						)
+						'th',
+						{ className: 'name' },
+						'Name'
+					),
+					_react2.default.createElement(
+						'th',
+						{ className: 'sector' },
+						' Sector'
+					),
+					_react2.default.createElement(
+						'th',
+						{ className: 'industry' },
+						'Industry'
+					),
+					_react2.default.createElement(
+						'th',
+						{ className: 'ipo' },
+						'IPO'
 					)
-				);
-			})
+				)
+			)
+		),
+		_react2.default.createElement(
+			'div',
+			{ id: 'divOuter', style: { maxHeight: '80vh', overflowY: 'auto' } },
+			_react2.default.createElement(
+				'div',
+				{ id: 'divInner' },
+				_react2.default.createElement(
+					'table',
+					null,
+					_react2.default.createElement(
+						'tbody',
+						null,
+						nasdaq.length ? nasdaq.map(function (stock, index) {
+							return _react2.default.createElement(
+								'tr',
+								{ key: index },
+								_react2.default.createElement(
+									'td',
+									{ className: 'symbol' },
+									stock.symbol
+								),
+								_react2.default.createElement(
+									'td',
+									{ id: index, className: 'name' },
+									stock.name
+								),
+								_react2.default.createElement(
+									'td',
+									{ id: index, className: 'sector' },
+									stock.sector
+								),
+								_react2.default.createElement(
+									'td',
+									{ id: index, className: 'industry' },
+									stock.industry
+								),
+								_react2.default.createElement(
+									'td',
+									{ id: index, className: 'ipo' },
+									stock.ipo
+								)
+							);
+						}) : null
+					)
+				)
+			)
 		)
 	);
 };
