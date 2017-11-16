@@ -3,35 +3,48 @@ const router = new express.Router();
 
 const yahooFinance = require('yahoo-finance');
 const dateFormat = require('dateformat');
-const nasdaqData = require( '../../../nasdaq.json');
-let lastRow = [];
-let firstRow = 0;
-let id;
-const nasdaqLen = nasdaqData.length - 1;
+let nasdaqData = require( '../../../nasdaq.json');
+
+let id = 0;
+const increment = 100;
+let lastRow;
+let firstRow;
+
+const nasdaqLen = nasdaqData.length;
+
+nasdaqData = nasdaqData.map( obj => Object.assign( {}, obj, { "id":id++ }));
 
 module.exports = router;
 
 router.get('/nasdaq', (req, res, next) => {
-	
+
 	const rowParam = req.query;
 
 	if(Object.keys(rowParam).length){
-		lastRow = [];
-		Object.keys(rowParam).map( num => {
-			lastRow.push( rowParam[num]*1 );	
-		})
 
-		firstRow = lastRow[0];
-		lastRow = lastRow[1] + 100;
-		console.log('...nasdaqLen, first,last', nasdaqLen, firstRow, lastRow);
-		if( lastRow > nasdaqLen ){
+
+		if( lastRow >= nasdaqLen ){
 			lastRow = nasdaqLen;
-			firstRow = lastRow - 100;
+		}else{
+			firstRow = lastRow;
+			lastRow += increment;
 		}
+		// lastRow = [];
+		// Object.keys(rowParam).map( num => {
+		// 	lastRow.push( rowParam[num]*1 );
+		// })
+
+		// firstRow = lastRow[0];
+		// lastRow = lastRow[1] + 100;
+		// console.log('...nasdaqLen, first,last', nasdaqLen, firstRow, lastRow);
+		// if( lastRow > nasdaqLen ){
+		// 	lastRow = nasdaqLen;
+		// 	firstRow = lastRow - 100;
+		// }
+
 	}else{
-		id = 0;
+		lastRow = increment;
 		firstRow = 0;
-		lastRow = 100;
 	}
 
 	res.send( createNewObject( nasdaqData ));
@@ -54,7 +67,7 @@ router.get('/nasdaq/search', (req, res, next) => {
 
 	let searchedArray = [];
 	const { searchedStock } =  req.query;
-	
+
 	nasdaqData.forEach( stock => {
 		if( stock.Name.toUpperCase().indexOf( searchedStock.toUpperCase() ) > -1 ){
 			searchedArray.push( stock );
@@ -68,7 +81,8 @@ router.get('/nasdaq/search', (req, res, next) => {
 createNewObject = ( arr ) => {
 	let obj = {};
 	let nasdaq = [];
-	
+	const dataLength = nasdaqLen - 1;
+
 	arr = arr.slice(firstRow, lastRow);
 	console.log('arr length, firstRow, lastRow', arr.length, firstRow, lastRow);
 	arr.forEach( item => {
@@ -77,7 +91,8 @@ createNewObject = ( arr ) => {
 		obj.sector = item.Sector;
 		obj.industry = item.industry;
 		obj.ipo = item.IPOyear;
-		obj.id = id++;
+		obj.id = item.id;
+		obj.len = dataLength;
 		nasdaq.push(obj)
 		obj= {};
 	})

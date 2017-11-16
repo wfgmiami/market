@@ -67,7 +67,8 @@ class App extends Component{
 		divOuter = document.getElementById("divOuter");
 		divInner = document.getElementById("divInner");
 		divOuter.addEventListener("scroll", this.handleScroll);
-		
+		localStorage.clear();
+
 		axios.get('/api/stocks/nasdaq')
 		.then( response => response.data )
 		.then( nasdaq => this.setState( { nasdaq }))
@@ -86,35 +87,101 @@ class App extends Component{
 		var scrollPercentage = (currentY / (scrollHeight - posHeight ));
 		//console.log('.....', scrollPercentage,currentY,posHeight,scrollHeight )
 
-		if(scrollPercentage > 0.9 || scrollPercentage < 0.1) {
-		
-			var isRowVisible = isElementVisible(divOuter);
-			var visibleRows = getVisibleRows(isRowVisible);
-	
-			const firstLastRows = [visibleRows[0]];
-			firstLastRows.push(visibleRows[visibleRows.length - 1]);
-			
-			console.log('firstLastRow....',firstLastRows);
-			localStorage.setItem("nasdaq", JSON.stringify(this.state.nasdaq));
 
-			axios.get('/api/stocks/nasdaq', { params: firstLastRows })
-			.then( response => response.data )
-			.then( nasdaq => {
-				this.setState( { nasdaq })	
-			})
-			.catch( err => console.log( err ))
-			console.log('storage......', JSON.parse(localStorage.getItem("nasdaq")));
+		var isRowVisible = isElementVisible(divOuter);
+		var visibleRows = getVisibleRows(isRowVisible);
+		// console.log(scrollPercentage < 0.1);
+
+		if(scrollPercentage < 0.1){
+			let lastRow = this.state.nasdaq[0].id;
+
+			let firstRow = lastRow - 100;
+			if(firstRow <= 0) firstRow = 0;
+			if(!lastRow) lastRow = 100;
+
+			const stored = JSON.parse(localStorage.getItem("nasdaq"));
+
+			if(stored){
+				const nasdaq = stored.slice(firstRow,lastRow);
+				this.setState( { nasdaq })
+			}
+
+			if(!scrollPercentage){
+				const nasdaq = stored.slice(0,100);
+				this.setState( { nasdaq })
+			}
+
+			// console.log('negative',scrollPercentage,typeof(scrollPercentage), firstRow,lastRow,this.state.nasdaq);
+
+			// if( lastRow >= nasdaqLen ){
+			// 	lastRow = nasdaqLen;
+			// }else{
+			// 	firstRow = lastRow;
+			// 	lastRow += increment;
+			// }
+			// console.log('.....visibleRows, state', visibleRows[0]*1,this.state.nasdaq, JSON.parse(localStorage.getItem("nasdaq")));
+
+			// const endRow = this.state.nasdaq[0].id;
+			// const firstVisibleRow = visibleRows[0] * 1;
+
+			// if(firstVisibleRow - endRow < 10 && endRow - 100 > 0){
+			// 	const storage = JSON.parse(localStorage.getItem("nasdaq"));
+			// 	// console.log('in if.....', storage[0]);
+
+			// }else{
+			// 	// console.log('negative', endRow-100);
+			// }
 		}
 
-	    function getVisibleRows(isRowVis ){
+
+		if(scrollPercentage > 0.9 ) {
+
+			var stored = JSON.parse(localStorage.getItem("nasdaq"));
+			var lastStored = 0;
+
+			if(stored){
+				lastStored = stored[stored.length-1].id;
+			}
+
+			var dataLength = this.state.nasdaq[0].len;
+			// console.log('................',lastStored, dataLength,this.state.nasdaq[0]);
+
+			const firstLastRows = [visibleRows[0]];
+			firstLastRows.push(visibleRows[visibleRows.length - 1]);
+
+			// console.log('firstLastRow....',firstLastRows);
+
+			// axios.get('/api/stocks/nasdaq', { params: firstLastRows })
+
+			axios.get('/api/stocks/nasdaq', { params: 1 })
+			.then( response => response.data )
+			.then( nasdaq => {
+				this.setState( { nasdaq })
+			})
+			.catch( err => console.log( err ))
+
+			if(stored){
+				if(lastStored < dataLength){
+					stored = stored.concat(this.state.nasdaq);
+					localStorage.setItem("nasdaq", JSON.stringify(stored));
+				}
+			}else{
+				localStorage.setItem("nasdaq", JSON.stringify(this.state.nasdaq));
+			}
+
+
+			// console.log('storage..state....', JSON.parse(localStorage.getItem("nasdaq")), this.state.nasdaq);
+		}
+
+	    function getVisibleRows( isRowVis ){
 			var cells = Array.prototype.slice.call(document.getElementsByClassName("symbol"),0);
-//			console.log('cells....', cells);	
-			function rowIndex( cell ) { console.log( 'tr id....',cell.parentNode.id ); return cell.parentNode.id };
+//			console.log('cells....', cells);
+			function rowIndex( cell ) { return cell.parentNode.id };
 			return cells.filter( isRowVis ).map( rowIndex );
 		}
 
 		function isElementVisible(container){
-			
+
 			var containerHeight = container.clientHeight;
 			return function(element){
 				var containerTop = container.scrollTop;
@@ -127,7 +194,7 @@ class App extends Component{
 			}
 		}
 
-			
+
 	}
 
 	reset(){

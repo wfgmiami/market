@@ -3,10 +3,16 @@ import { Link } from 'react-router-dom';
 
 const StocksList = ( { nasdaq, searchFlag, reset }) => {
 // console.log('..............in StocksList.js',searchFlag, nasdaq);
-const total = nasdaq.length;
+//const total = nasdaq.length;
+let total;
+if( JSON.parse(localStorage.getItem("nasdaq")) ){
+	total = JSON.parse(localStorage.getItem("nasdaq")).length;
+}else{
+	total = 0;
+}
 
 return(
-	<div className="panel-footer"><b>Total listed stocks: <span className="badge badge-info"> { total }</span>{ searchFlag ? <span className="pull-right"><button className="btn btn-primary" onClick={ reset }>Reset</button></span> : null }</b>
+	<div className="panel-footer"><b>Total in localStorage: <span className="badge badge-info"> { total }</span>{ searchFlag ? <span className="pull-right"><button className="btn btn-primary" onClick={ reset }>Reset</button></span> : null }</b>
 
 
 
