@@ -2,3 +2,43 @@
   box-sizing: border-box;
 }
 
+
+th {
+	border-right: 1px solid #fff;
+}
+
+th,
+td {
+	padding: 5px 5px;
+  vertical-align: middle;
+}
+
+thead {
+	background: #395870;
+	color: #fff;
+	font-size: 14px;
+}
+
+tr {
+	height: 30px;
+}
+
+.symbol{
+  width: 10%
+}
+
+.name{
+  width: 35%
+}
+
+.sector{
+  width: 12%
+}
+
+.industry{
+  width: 35%
+}
+
+.ipo{
+  width: 8%
+}

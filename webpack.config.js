@@ -1,3 +1,5 @@
+const webpack = require('webpack');
+
 module.exports = {
 	entry: './browser/react/index.js',
 	output: {
@@ -5,6 +7,7 @@ module.exports = {
 		filename: './public/bundle.js'
 	},
 	devtool: 'source-map',
+
 	module: {
 		loaders:[
 			{ test: /\.js$/,
@@ -13,6 +16,10 @@ module.exports = {
 			  query: { presets: ['es2015', 'react'] }
 			}
 		]
-	}
-
+	},
+	plugins: [
+		new webpack.ProvidePlugin({
+			Promise: 'es6-promise-promise',
+		})
+	]
 }
